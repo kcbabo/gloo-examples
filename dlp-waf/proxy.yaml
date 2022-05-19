@@ -11,7 +11,7 @@ spec:
       waf:
         auditLogging:
           action: ALWAYS
-          location: FILTER_STATE
+          location: DYNAMIC_METADATA
       dlp:
         enabledFor: ALL
         dlpRules:
