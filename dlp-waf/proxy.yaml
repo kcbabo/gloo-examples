@@ -16,7 +16,17 @@ spec:
         enabledFor: ALL
         dlpRules:
           - actions:
-            - keyValueAction:
+            - actionType: CUSTOM # CUSTOM is the default, so it's not necessary to put the actionType here
+              customAction:
+                name: api-key
+                maskChar: "X"
+                percent:
+                  value: 25
+                regexActions:
+                  - regex: api-key:? *([^\\n]*)(?:\\n)
+                    subgroup: 1
+            - actionType: KEYVALUE
+              keyValueAction:
                 keyToMask: api-key
                 maskChar: "*"
                 name: api-key   # only used for logging
