@@ -1,0 +1,35 @@
+apiVersion: gateway.solo.io/v1
+kind: Gateway
+metadata:
+  name: gateway-proxy
+  namespace: gloo-system
+spec:
+  bindAddress: '::'
+  bindPort: 8080
+  httpGateway: 
+    options:
+      waf:
+        auditLogging:
+          action: ALWAYS
+          location: FILTER_STATE
+      dlp:
+        enabledFor: ALL
+        dlpRules:
+          - actions:
+            - keyValueAction:
+                keyToMask: api-key
+                maskChar: "*"
+                name: api-key   # only used for logging
+                percent:
+                  value: 25  # % of regex match to mask
+  proxyNames:
+  - gateway-proxy
+  useProxyProto: false
+  options:
+    accessLoggingService:
+      accessLog:
+      - fileSink:
+          jsonFormat:
+            waf: '%DYNAMIC_METADATA(io.solo.modsecurity.audit_log)%'
+            api-key: '%REQ(api-key)%'
+          path: /dev/stdout

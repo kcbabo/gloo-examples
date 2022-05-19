@@ -1,0 +1,54 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mock-apis
+  name: mock-apis
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: mock-apis
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mock-apis
+    spec:
+      containers:
+      - image: kcbabo/mock-apis:latest
+        name: mock-apis
+        ports:
+        - containerPort: 5000
+          name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mock-apis
+  namespace: default
+  labels:
+    service: mock-apis
+spec:
+  ports:
+  - port: 5000
+    protocol: TCP
+  selector:
+    app: mock-apis
+---
+apiVersion: gateway.solo.io/v1
+kind: VirtualService
+metadata:
+  name: default
+  namespace: gloo-system
+spec:
+  virtualHost:
+    domains:
+    - '*'
+    routes:
+    - routeAction:
+        single:
+          upstream:
+            name: default-mock-apis-5000
+            namespace: gloo-system
