@@ -16,23 +16,15 @@ spec:
           - ruleStr: |
               # Set audit log format to JSON
               # This must be set for the audit logs to be generated into Dynamic Metadata
-              # even if ModSecurity isn't enabled or no rules are defined.
-              #
-              # I tried Native instead of JSON and it printed but didn't mask.
               SecAuditLogFormat JSON
       dlp:
         enabledFor: ALL
         dlpRules:
           - actions:
-            - actionType: CUSTOM # CUSTOM is the default, so it's not necessary to put the actionType here
-              customAction:
-                name: api-key
-                maskChar: "X"
-                percent:
-                  value: 25
-                regexActions:
-                  - regex: api-key:? *([^\\n]*)(?:\\n)
-                    subgroup: 1
+            - actionType: SSN
+              shadow: true
+            - actionType: ALL_CREDIT_CARDS
+              shadow: true
             - actionType: KEYVALUE
               keyValueAction:
                 keyToMask: api-key
