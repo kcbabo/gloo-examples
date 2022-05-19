@@ -12,6 +12,14 @@ spec:
         auditLogging:
           action: ALWAYS
           location: DYNAMIC_METADATA
+        ruleSets:
+          - ruleStr: |
+              # Set audit log format to JSON
+              # This must be set for the audit logs to be generated into Dynamic Metadata
+              # even if ModSecurity isn't enabled or no rules are defined.
+              #
+              # I tried Native instead of JSON and it printed but didn't mask.
+              SecAuditLogFormat JSON
       dlp:
         enabledFor: ALL
         dlpRules:
@@ -40,6 +48,6 @@ spec:
       accessLog:
       - fileSink:
           jsonFormat:
-            waf: '%DYNAMIC_METADATA(io.solo.modsecurity.audit_log)%'
+            waf: '%DYNAMIC_METADATA(io.solo.filters.http.modsecurity:audit_log)%'
             api-key: '%REQ(api-key)%'
           path: /dev/stdout
